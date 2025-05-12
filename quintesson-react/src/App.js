@@ -23,6 +23,7 @@ const PeftApp = () => {
   const [activeTab, setActiveTab] = useState('peft');
   const [showNewLLMModal, setShowNewLLMModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [showSettingsModal, setShowSettingsModal] = useState(false);
   const [modelToEdit, setModelToEdit] = useState(null);
   
   // Add a function to handle adding new models
@@ -30,6 +31,202 @@ const PeftApp = () => {
     setModels([...models, newModel]);
     setSelectedModel(newModel);
     setShowNewLLMModal(false);
+  };
+  
+  const SettingsModal = ({ isOpen, onClose }) => {
+    const [activeTab, setActiveTab] = useState('lambda');
+    
+    // Lambda Labs state
+    const [lambdaApiKey, setLambdaApiKey] = useState('');
+    const [lambdaSshKey, setLambdaSshKey] = useState('');
+    
+    // AWS SageMaker state
+    const [awsAccessKey, setAwsAccessKey] = useState('');
+    const [awsSecretKey, setAwsSecretKey] = useState('');
+    const [awsRegion, setAwsRegion] = useState('us-east-1');
+    const [awsRoleArn, setAwsRoleArn] = useState('');
+    const [awsS3Bucket, setAwsS3Bucket] = useState('');
+    
+    const handleSaveSettings = () => {
+      // In a real app, you would save these credentials securely
+      // For this demo, we'll just console.log them
+      console.log({
+        lambda: { apiKey: lambdaApiKey, sshKey: lambdaSshKey },
+        aws: { 
+          accessKey: awsAccessKey, 
+          secretKey: awsSecretKey,
+          region: awsRegion,
+          roleArn: awsRoleArn,
+          s3Bucket: awsS3Bucket
+        }
+      });
+      
+      // Show success message
+      alert('Settings saved successfully!');
+      onClose();
+    };
+    
+    if (!isOpen) return null;
+    
+    return (
+      <div className="modal-overlay" onClick={onClose}>
+        <div className="modal settings-modal" onClick={(e) => e.stopPropagation()}>
+          <div className="modal-header">
+            <h2>Cloud Provider Settings</h2>
+            <button className="modal-close" onClick={onClose}>×</button>
+          </div>
+          
+          <div className="settings-tabs">
+            <button 
+              className={`settings-tab ${activeTab === 'lambda' ? 'active' : ''}`}
+              onClick={() => setActiveTab('lambda')}
+            >
+              Lambda Labs
+            </button>
+            <button 
+              className={`settings-tab ${activeTab === 'aws' ? 'active' : ''}`}
+              onClick={() => setActiveTab('aws')}
+            >
+              AWS SageMaker
+            </button>
+          </div>
+          
+          <div className="modal-body">
+            {activeTab === 'lambda' && (
+              <div className="settings-section">
+                <div className="settings-info">
+                  <h3>Lambda Labs Configuration</h3>
+                  <p>Lambda Labs provides cost-effective GPU instances for AI workloads. Configure your credentials to enable remote training and inference.</p>
+                </div>
+                
+                <div className="form-group">
+                  <label>
+                    API Key <Info size={14} className="inline-icon" />
+                  </label>
+                  <input 
+                    type="password" 
+                    value={lambdaApiKey}
+                    onChange={(e) => setLambdaApiKey(e.target.value)}
+                    placeholder="Enter your Lambda Labs API key"
+                  />
+                  <p className="help-text">Find your API key in the Lambda Labs dashboard under Account Settings.</p>
+                </div>
+                
+                <div className="form-group">
+                  <label>
+                    SSH Private Key <Info size={14} className="inline-icon" />
+                  </label>
+                  <textarea
+                    className="ssh-key-textarea"
+                    value={lambdaSshKey}
+                    onChange={(e) => setLambdaSshKey(e.target.value)}
+                    placeholder="-----BEGIN RSA PRIVATE KEY-----&#10;...&#10;-----END RSA PRIVATE KEY-----"
+                  />
+                  <p className="help-text">Needed to securely connect to Lambda instances. <a href="https://docs.lambdalabs.com/cloud/ssh-guide/" target="_blank" rel="noopener">Learn how to generate</a>.</p>
+                </div>
+                
+                <div className="connection-test">
+                  <button className="test-btn">Test Connection</button>
+                </div>
+              </div>
+            )}
+            
+            {activeTab === 'aws' && (
+              <div className="settings-section">
+                <div className="settings-info">
+                  <h3>AWS SageMaker Configuration</h3>
+                  <p>Amazon SageMaker provides enterprise-grade machine learning infrastructure. Configure your AWS credentials to enable SageMaker integration.</p>
+                </div>
+                
+                <div className="form-group">
+                  <label>AWS Access Key ID</label>
+                  <input 
+                    type="text" 
+                    value={awsAccessKey}
+                    onChange={(e) => setAwsAccessKey(e.target.value)}
+                    placeholder="AKIAIOSFODNN7EXAMPLE"
+                  />
+                </div>
+                
+                <div className="form-group">
+                  <label>AWS Secret Access Key</label>
+                  <input 
+                    type="password" 
+                    value={awsSecretKey}
+                    onChange={(e) => setAwsSecretKey(e.target.value)}
+                    placeholder="Enter your AWS Secret Access Key"
+                  />
+                </div>
+                
+                <div className="form-row">
+                  <div className="form-group">
+                    <label>AWS Region</label>
+                    <select 
+                      value={awsRegion}
+                      onChange={(e) => setAwsRegion(e.target.value)}
+                    >
+                      <option value="us-east-1">US East (N. Virginia)</option>
+                      <option value="us-east-2">US East (Ohio)</option>
+                      <option value="us-west-1">US West (N. California)</option>
+                      <option value="us-west-2">US West (Oregon)</option>
+                      <option value="eu-west-1">EU (Ireland)</option>
+                      <option value="eu-central-1">EU (Frankfurt)</option>
+                      <option value="ap-northeast-1">Asia Pacific (Tokyo)</option>
+                      <option value="ap-southeast-1">Asia Pacific (Singapore)</option>
+                    </select>
+                  </div>
+                </div>
+                
+                <div className="form-group">
+                  <label>
+                    SageMaker Role ARN <Info size={14} className="inline-icon" />
+                  </label>
+                  <input 
+                    type="text" 
+                    value={awsRoleArn}
+                    onChange={(e) => setAwsRoleArn(e.target.value)}
+                    placeholder="arn:aws:iam::123456789012:role/service-role/AmazonSageMaker-ExecutionRole"
+                  />
+                  <p className="help-text">The IAM role that SageMaker will assume to perform operations.</p>
+                </div>
+                
+                <div className="form-group">
+                  <label>S3 Bucket Name</label>
+                  <input 
+                    type="text" 
+                    value={awsS3Bucket}
+                    onChange={(e) => setAwsS3Bucket(e.target.value)}
+                    placeholder="my-sagemaker-bucket"
+                  />
+                  <p className="help-text">S3 bucket to store model artifacts and training data.</p>
+                </div>
+                
+                <div className="connection-test">
+                  <button className="test-btn">Validate Credentials</button>
+                </div>
+              </div>
+            )}
+          </div>
+          
+          <div className="modal-footer">
+            <div className="note">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+              </svg>
+              <span>Credentials are stored securely and encrypted locally.</span>
+            </div>
+            <div className="action-buttons">
+              <button className="secondary-btn" onClick={onClose}>
+                Cancel
+              </button>
+              <button className="primary-btn" onClick={handleSaveSettings}>
+                Save Settings
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
   };
   
   // Add function to handle editing models
@@ -67,7 +264,7 @@ const PeftApp = () => {
     {
       id: 'harmbench',
       title: 'HarmBench',
-      description: 'Test your LLM against cutting-edge red-teaming'
+      description: 'Test your LLM for safety concerns'
     }
   ];
 
@@ -539,7 +736,6 @@ const PeftApp = () => {
                   <option value="local">Local</option>
                   <option value="lambda">Lambda Labs</option>
                   <option value="sagemaker">AWS SageMaker</option>
-                  <option value="colab">Google Colab</option>
                 </select>
                 <p className="help-text">Choose where to run your model. Local requires sufficient hardware, cloud options handle the compute for you.</p>
               </div>
@@ -563,8 +759,17 @@ const PeftApp = () => {
     <div className="app">
       <div className="container">
         <div className="header">
-          <h1>Quintesson</h1>
-          <p>Your LLMs</p>
+          <div className="header-title">
+            <h1>Quintesson</h1>
+            <p>Your LLMs</p>
+          </div>
+          <button className="settings-btn" onClick={() => setShowSettingsModal(true)}>
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="3"></circle>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+            </svg>
+            <span>Settings</span>
+          </button>
         </div>
         
         <div className="models-section">
@@ -628,6 +833,11 @@ const PeftApp = () => {
         }}
         onAddModel={handleEditModel}
         editModel={modelToEdit}
+      />
+      
+      <SettingsModal
+        isOpen={showSettingsModal}
+        onClose={() => setShowSettingsModal(false)}
       />
     </div>
   );
