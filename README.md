@@ -1,5 +1,4 @@
 # quintesson
-<<<<<<< HEAD
 quintesson makes fine-tuning and memory-editing in Language Models accessible to people with a non-technical background. Now, anybody can train and host their own Language Models without ever having to open a terminal or code a single line of code. 
 
 Currently, there are similar solutions with custom GPTs and RAG.  But, Parameter-Efficient Fine Tuning changes the model’s behavior internally and persistently — not just fetching knowledge and MemIT edits factual knowledge or associations directly in model weights, rather than relying on external documents. RAG is great for flexible, fresh knowledge but depends on retrieval quality and external document accuracy. Whereas, PEFT + MemIT = persistent, low-latency, truly integrated behavioral or factual change.
@@ -23,6 +22,3 @@ Use:
 - Uses MemIT to edit specific facts like return periods, product specs, and pricing logic.
 - Instantly tests and iterates through a GUI to refine how the model responds to edge cases like damage claims or delivery delays.
 - Why not RAG?: He doesn’t want to maintain or troubleshoot a document store and vector DB. He needs fast, baked-in answers with low hosting costs and no infra maintenance
-=======
-The aim of quintesson is to lower the bar on opening the black boxes of modern Generative Models. Combining cutting-edge research in Mechanistic Interpretability, Representation Engineering, and Data Attribution within a user-centric application with the goal of democratizing some of the most powerful tools in our shared history.
->>>>>>> 3d6293b (OK lowk final commit for front-end then i gotta push backend stuff)
